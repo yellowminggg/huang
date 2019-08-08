@@ -1,0 +1,72 @@
+107页
+    User.findOne({
+        $or: [{
+                email: body.email
+            },
+            {
+                nickname: body.nickname
+            }
+        ]
+    }, function(err, data) {
+
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: '服务器错误'
+            })
+        }
+        if (data) {
+            return res.status(200).json({
+                err_code: 1,
+                message: '邮箱或者密码已存在'
+            })
+        }
+body.password = md5(md5(body.password))
+new User(body).save(function(err, user) {
+    if (err) {
+        return res.status(500).json({
+            err_code: 500,
+            message: '服务器错误'
+        })
+    }
+    res.status(200).json({
+        err_code: 0,
+        message: 'ok'
+
+    })
+})
+})
+})
+
+
+107第二种
+
+  var body = req.body
+    try {
+        if (await User.findOne({ email: body.email })) {
+            return res.status(200).json({
+                err_code: 1,
+                message: '邮箱已存在'
+            })
+        }
+        if (await User.findOne({ nickname: body.nickname })) {
+            return res.status(200).json({
+                err_code: 2,
+                message: '昵称已存在'
+            })
+        }
+        body.password = md5(md5(body.password))
+        await new User(body).save()
+        res.status(200).json({
+            err_code: 0,
+            message: 'ok'
+        })
+    } catch (err) {
+        res.status(500).json({
+            err_code: 500,
+            message: '服务器错误'
+        })
+    }
+})
+
+module.exports = router
